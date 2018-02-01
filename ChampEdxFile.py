@@ -11,6 +11,7 @@
 
 from lxml import etree
 import numpy as np
+import NumpyUtility as nu
 from io import StringIO
 
 from matplotlib import pyplot as pp
@@ -31,13 +32,16 @@ class ChampEdxFile:
         '''Read and parse a .edx file
         
         f can be either a file name or a file object'''
-        if isInstance(f, file):
+        if isinstance(f, file):
             fileLike = f
         else:
             fileLike = open(f)
             
         # Start by parsing xml
-        self._tree = etree.parse(fileLike)
+        ## Prevent errors due to large text nodes.  There is some security risk to this,
+        ## but it is unavoidable in this application
+        p = etree.XMLParser(huge_tree=True)
+        self._tree = etree.parse(fileLike, p)
         self._root = self._tree.getroot()
         
         # Now start filling attributes read from file
@@ -71,16 +75,40 @@ class ChampEdxFile:
         ## Read the frequency vector
         freqElement = self._root.find('{http://www.edi-forum.org}Data/{http://www.edi-forum.org}Variable[@Name="SpherCut_Frequency"]/{http://www.edi-forum.org}Component/')
         freqText = StringIO(unicode(freqElement.text))
-        self._freqs = np.loadtxt(freqText)
+        self.frequency = np.loadtxt(freqText)
         
         # Now read the actual data
         radPatElement = self._root.find('{http://www.edi-forum.org}Data/{http://www.edi-forum.org}Variable[@Name="SpherCut_RadiationPattern"]/{http://www.edi-forum.org}Component/')
         radPatText = StringIO(unicode(radPatElement.text))
-        radPats = np.loadtxt(radPatText).reshape(radPatShape)
+        rP = np.loadtxt(radPatText)
+        radPats = rP.reshape(radPatShape)
         self._radPat = radPats[:,:,:,:,0] + 1j*radPats[:,:,:,:,1]
         
         # Should now have all data from file
         
     def getPatternByFreq(self, freq):
         '''Return the radiation pattern at one frequency in frequency vector'''
-        pass
+        # Get the index of the nearest frequency in the frequency vector
+        freqIdx = nu.findNearestIdx(self.frequency, freq)
+        
+        return self._radPat[:,:,:,freqIdx]
+        
+
+    def getPattern(self, component, phi, freq):
+        '''Return an individual radiation pattern for one component, cut angle and frequency'''
+        freqIdx = nu.findNearestIdx(self.frequency, freq)
+        phiIdx = nu.findNearestIdx(self.phi, phi)
+        
+        return self._radPat[component,phiIdx,:,freqIdx]
+        
+    def plotPatterndB(self, component, phi, freq, label=None):
+        '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency'''
+        radPat = self.getPattern(component, phi, freq)
+        
+        phi = nu.findNearest(self.phi, phi)
+        freq = nu.findNearest(self.frequency, freq)
+        
+        if label==None:
+            label = r"Component {:d}, $\phi={:g}^\circ$, {:g} GHz".format(component, phi, freq/1.0e9) 
+        pp.plot(self.theta, 20*np.log10(np.abs(radPat)), label=label)
+        
