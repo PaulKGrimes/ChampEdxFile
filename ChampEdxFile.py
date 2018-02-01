@@ -73,7 +73,7 @@ class ChampEdxFile:
         self.theta = np.loadtxt(thetaText)
 
         ## Read the frequency vector
-        freqElement = self._root.find('{http://www.edi-forum.org}Data/{http://www.edi-forum.org}Variable[@Name="SpherCut_Frequency"]/{http://www.edi-forum.org}Component/')
+        freqElement = self._root.find('{http://www.edi-forum.org}Declarations/{http://www.edi-forum.org}Folder/{http://www.edi-forum.org}Variable[@Name="SpherCut_Frequency"]/{http://www.edi-forum.org}Component/')
         freqText = StringIO(unicode(freqElement.text))
         self.frequency = np.loadtxt(freqText)
         
