@@ -118,3 +118,15 @@ class ChampApertureFieldEdxFile:
             label = r"Component {:d}, $\phi={:g}^\circ$, z={:g}mm, {:g} GHz".format(component, phi, z*1e3, freq/1.0e9) 
         pp.plot(self.rho, 20*np.log10(np.abs(apertureField)), label=label)
         
+    def plotPatternPhase(self, component, phi, z, freq, label=None):
+        '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency'''
+        apertureField = self.getPattern(component, phi, z, freq)
+        
+        phi = nu.findNearest(self.phi, phi)
+        freq = nu.findNearest(self.frequency, freq)
+        z = nu.findNearest(self.z, z)
+        
+        if label==None:
+            label = r"Component {:d}, $\phi={:g}^\circ$, z={:g}mm, {:g} GHz".format(component, phi, z*1e3, freq/1.0e9) 
+        pp.plot(self.rho, np.rad2deg(np.angle(apertureField)-np.angle(apertureField[0])), label=label)
+        
