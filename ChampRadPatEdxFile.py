@@ -16,7 +16,7 @@ from io import StringIO
 
 from matplotlib import pyplot as pp
 
-class ChampRadPatEDXFile:
+class ChampRadPatEdxFile:
     '''Class to parse and hold data from a CHAMP .edx output file.'''
     def __init__(self, fileLike=None):
         '''Create a ChampEdxFile object, reading and parsing from <file>.
@@ -25,7 +25,7 @@ class ChampRadPatEDXFile:
         # Flag to prevent errors from calling methods on objects with no data
         self.__ready = False
         
-        if fileLike !=None:
+        if fileLike:
             self.read(fileLike)
             
     def read(self, f):

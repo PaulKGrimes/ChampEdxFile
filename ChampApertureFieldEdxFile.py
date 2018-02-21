@@ -25,7 +25,7 @@ class ChampApertureFieldEdxFile:
         # Flag to prevent errors from calling methods on objects with no data
         self.__ready = False
         
-        if fileLike !=None:
+        if fileLike:
             self.read(fileLike)
             
     def read(self, f):
