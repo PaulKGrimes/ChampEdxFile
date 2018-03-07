@@ -101,7 +101,7 @@ class ChampRadPatEdxFile:
         
         return self._radPat[component,phiIdx,:,freqIdx]
         
-    def plotPatterndB(self, component, phi, freq, label=None):
+    def plotPatterndB(self, component, phi, freq, label=None, **kwargs):
         '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency'''
         radPat = self.getPattern(component, phi, freq)
         
@@ -110,5 +110,16 @@ class ChampRadPatEdxFile:
         
         if label==None:
             label = r"Component {:d}, $\phi={:g}^\circ$, {:g} GHz".format(component, phi, freq/1.0e9) 
-        pp.plot(self.theta, 20*np.log10(np.abs(radPat)), label=label)
+        pp.plot(self.theta, 20*np.log10(np.abs(radPat)), label=label, **kwargs)
+        
+    def plotPatternPhase(self, component, phi, freq, label=None, **kwargs):
+        '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency'''
+        radPat = self.getPattern(component, phi, freq)
+        
+        phi = nu.findNearest(self.phi, phi)
+        freq = nu.findNearest(self.frequency, freq)
+        
+        if label==None:
+            label = r"Component {:d}, $\phi={:g}^\circ$, {:g} GHz".format(component, phi, freq/1.0e9) 
+        pp.plot(self.theta, np.rad2deg(np.angle(radPat)-np.angle(radPat[0])), label=label, **kwargs)
         

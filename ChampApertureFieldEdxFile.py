@@ -47,7 +47,7 @@ class ChampApertureFieldEdxFile:
         # Now start filling attributes read from file
         
         ## Read the shape of the radiation pattern data
-        apertureFieldShapeText = self._root.find('{http://www.edi-forum.org}Declarations/{http://www.edi-forum.org}Folder/{http://www.edi-forum.org}Variable[@Name="PlaneCut_E_RadiationPattern"]/{http://www.edi-forum.org}Sizes').text
+        apertureFieldShapeText = self._root.find('{http://www.edi-forum.org}Declarations/{http://www.edi-forum.org}Folder/{http://www.edi-forum.org}Variable[@Name="PlaneCut_E"]/{http://www.edi-forum.org}Sizes').text
         apertureFieldShape = []
         
         ### Read and manipulate shape to allow for complex numbers
@@ -58,8 +58,8 @@ class ChampApertureFieldEdxFile:
         self._shape = apertureFieldShape
         
         ## Read the field component number and type 
-        self.nComponents = int(self._root.find('{http://www.edi-forum.org}Declarations/{http://www.edi-forum.org}Folder/{http://www.edi-forum.org}Variable[@Name="PlaneCut_E_ProjectionComponents"]/{http://www.edi-forum.org}Sizes').text)
-        self.componentType = self._root.find('{http://www.edi-forum.org}Declarations/{http://www.edi-forum.org}Folder/{http://www.edi-forum.org}Variable[@Name="PlaneCut_E_ProjectionComponents"]').attrib["Class"].split(':')[1]
+        self.nComponents = int(self._root.find('{http://www.edi-forum.org}Declarations/{http://www.edi-forum.org}Folder/{http://www.edi-forum.org}Variable[@Name="PlaneCut_ProjectionComponents"]/{http://www.edi-forum.org}Sizes').text)
+        self.componentType = self._root.find('{http://www.edi-forum.org}Declarations/{http://www.edi-forum.org}Folder/{http://www.edi-forum.org}Variable[@Name="PlaneCut_ProjectionComponents"]').attrib["Class"].split(':')[1]
         
         ## Read the phi cut values
         self.nPhi = int(self._root.find('{http://www.edi-forum.org}Declarations/{http://www.edi-forum.org}Folder/{http://www.edi-forum.org}Variable[@Name="PlaneCut_Phi"]/{http://www.edi-forum.org}Sizes').text)
@@ -68,8 +68,8 @@ class ChampApertureFieldEdxFile:
         self.phi = np.loadtxt(phiText)
         
         ## Read the z values
-        zElement = self._root.find('{http://www.edi-forum.org}Data/{http://www.edi-forum.org}Variable[@Name="PlaneCut_Z"]/{http://www.edi-forum.org}Component/')
-        zText = StringIO(unicode(rhoElement.text))
+        zElement = self._root.find('{http://www.edi-forum.org}Declarations/{http://www.edi-forum.org}Folder/{http://www.edi-forum.org}Variable[@Name="PlaneCut_Z"]/{http://www.edi-forum.org}Component/{http://www.edi-forum.org}Value')
+        zText = StringIO(unicode(zElement.text))
         self.z = np.loadtxt(zText)
         
         ## Read the rho values
@@ -83,11 +83,11 @@ class ChampApertureFieldEdxFile:
         self.frequency = np.loadtxt(freqText)
         
         # Now read the actual data
-        apertureFieldElement = self._root.find('{http://www.edi-forum.org}Data/{http://www.edi-forum.org}Variable[@Name="PlaneCut_E_RadiationPattern"]/{http://www.edi-forum.org}Component/')
+        apertureFieldElement = self._root.find('{http://www.edi-forum.org}Data/{http://www.edi-forum.org}Variable[@Name="PlaneCut_E"]/{http://www.edi-forum.org}Component/')
         apertureFieldText = StringIO(unicode(apertureFieldElement.text))
         rP = np.loadtxt(apertureFieldText)
         apertureFields = rP.reshape(apertureFieldShape)
-        self._apertureField = apertureFields[:,:,:,:,0] + 1j*apertureFields[:,:,:,:,1]
+        self._apertureField = apertureFields[:,:,:,:,:,0] + 1j*apertureFields[:,:,:,:,:,1]
         
         # Should now have all data from file
         
@@ -106,7 +106,7 @@ class ChampApertureFieldEdxFile:
         
         return self._apertureField[component, :, zIdx, phiIdx, freqIdx]
         
-    def plotPatterndB(self, component, phi, z, freq, label=None):
+    def plotPatterndB(self, component, phi, z, freq, label=None, **kwargs):
         '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency'''
         apertureField = self.getPattern(component, phi, z, freq)
         
@@ -116,9 +116,9 @@ class ChampApertureFieldEdxFile:
         
         if label==None:
             label = r"Component {:d}, $\phi={:g}^\circ$, z={:g}mm, {:g} GHz".format(component, phi, z*1e3, freq/1.0e9) 
-        pp.plot(self.rho, 20*np.log10(np.abs(apertureField)), label=label)
+        pp.plot(self.rho, 20*np.log10(np.abs(apertureField)), label=label, **kwargs)
         
-    def plotPatternPhase(self, component, phi, z, freq, label=None):
+    def plotPatternPhase(self, component, phi, z, freq, label=None, **kwargs):
         '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency'''
         apertureField = self.getPattern(component, phi, z, freq)
         
@@ -128,5 +128,5 @@ class ChampApertureFieldEdxFile:
         
         if label==None:
             label = r"Component {:d}, $\phi={:g}^\circ$, z={:g}mm, {:g} GHz".format(component, phi, z*1e3, freq/1.0e9) 
-        pp.plot(self.rho, np.rad2deg(np.angle(apertureField)-np.angle(apertureField[0])), label=label)
+        pp.plot(self.rho, np.rad2deg(np.angle(apertureField)-np.angle(apertureField[0])), label=label, **kwargs)
         
