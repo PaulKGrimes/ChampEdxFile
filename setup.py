@@ -7,7 +7,7 @@ def readme():
         return f.read()
 
 setup(name='ChampEdx',
-      version='0.1',
+      version='0.2',
       description='Code for reading TICRA CHAMP .edx files',
       long_description=readme(),
       classifiers=[

@@ -12,7 +12,7 @@
 from lxml import etree
 import numpy as np
 import NumpyUtility as nu
-from io import StringIO
+from io import StringIO, IOBase
 
 from matplotlib import pyplot as pp
 
@@ -32,7 +32,7 @@ class EdxFile:
         '''Read and parse a .edx file
 
         f can be either a file name or a file object'''
-        if isinstance(f, file):
+        if isinstance(f, IOBase):
             fileLike = f
         else:
             fileLike = open(f)

@@ -86,6 +86,36 @@ class RadiationPattern:
 
         # Should now have all data from file
 
+    def fromGraspCut(self, graspCutFile, freqs):
+        '''Fill the Radiation Pattern object from a Grasp Cut File'''
+        self.nComponents = graspCutFile.cutSets[0].cuts[0].field_components
+
+        if graspCutFile.cutSets[0].cuts[0].polarization == 3:
+            self.componentType = "Ludwig3"
+        # Additional switches needed here.
+
+        self.nPhi = len(graspCutFile.cutSets[0].cuts)
+        self.phi = np.zeros((self.nPhi), dtype=float)
+
+        self.theta = np.linspace(graspCutFile.cutSets[0].cuts[0].v_ini, graspCutFile.cutSets[0].cuts[0].v_ini + graspCutFile.cutSets[0].cuts[0].v_inc*(graspCutFile.cutSets[0].cuts[0].v_num-1), graspCutFile.cutSets[0].cuts[0].v_num)
+
+        self.frequency = apField.frequency
+
+        nFreq = len(graspCutFile.cutSets)
+        nCuts = len(graspCutFile.cutSets[0].cuts)
+        nCutIdx = len(self.theta)
+
+        self._shape = [self.nComponents, nCuts, nCutIdx, nFreq]
+
+        self._radPat = np.zeros(self._shape, dtype=np.complex)
+
+        for f, s in enumerate(graspCutFile.cutSets):  # Loop over frequency
+            for p, cut in enumerate(s.cuts): # Loop over phi
+                self.phi[p] = cut.constant
+                for i in range(self.nComponents):
+                    self._radPat[i, p, :, f] = cut.data[:]['f{:d}'.format(i+1)]
+
+
     def getPatternByFreq(self, freq):
         '''Return the radiation pattern at one frequency in frequency vector'''
         # Get the index of the nearest frequency in the frequency vector
