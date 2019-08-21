@@ -96,7 +96,7 @@ class ApertureField:
         # Get the index of the nearest frequency in the frequency vector
         freqIdx = nu.findNearestIdx(self.frequency, freq)
 
-        return self._apertureField[:,:,:,freqIdx]
+        return self._apertureField[:,:,:,:,freqIdx]
 
     def getPattern(self, component, phi, z, freq):
         '''Return an individual radiation pattern for one component, cut angle and frequency'''
