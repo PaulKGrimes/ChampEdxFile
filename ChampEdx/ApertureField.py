@@ -129,3 +129,14 @@ class ApertureField:
         if label==None:
             label = r"Component {:d}, $\phi={:g}^\circ$, z={:g}mm, {:g} GHz".format(component, phi, z*1e3, freq/1.0e9)
         pp.plot(self.rho, np.rad2deg(np.angle(apertureField)-np.angle(apertureField[0])), label=label, **kwargs)
+
+    def makeSingleSided(self):
+        """Converts a double sided aperture field (rho running from -a to +a, phi=0 to phi=180 def)
+        to a single side field (rho running from 0 to a, phi=0 to 360)"""
+        newRho = self.rho[int((len(self.rho))/2):]
+        newPhi = np.concatenate((self.phi[:], self.phi[1:]+180))
+        newApField = np.concatenate((self._apertureField[:,int(len(self.rho)/2):,:,:,:], self._apertureField[:,int(len(self.rho)/2)::-1,:,1:,:]), axis=3)
+        self.rho = newRho
+        self.phi = newPhi
+        self.nPhi = len(newPhi)
+        self._apertureField = newApField
