@@ -91,6 +91,14 @@ class ApertureField:
 
         # Should now have all data from file
 
+    def rotatePolarization(self, angle=45.0):
+        '''Rotate the basis of the polarization by <angle>'''
+        ang = np.deg2rad(angle)
+        output0 = self._apertureField[0,:,:,:,:]*np.cos(ang)-self._apertureField[1,:,:,:,:]*np.sin(ang)
+        output1 = self._apertureField[1,:,:,:,:]*np.cos(ang)+self._apertureField[0,:,:,:,:]*np.sin(ang)
+        self._apertureField[0,:,:,:,:] = output0
+        self._apertureField[1,:,:,:,:] = output1
+
     def getPatternByFreq(self, freq):
         '''Return the radiation pattern at one frequency in frequency vector'''
         # Get the index of the nearest frequency in the frequency vector
@@ -106,7 +114,7 @@ class ApertureField:
 
         return self._apertureField[component, :, zIdx, phiIdx, freqIdx]
 
-    def plotPatterndB(self, component, phi, z, freq, label=None, rho_scale=1.0 **kwargs):
+    def plotPatterndB(self, component, phi, z, freq, label=None, rho_scale=1.0, **kwargs):
         '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency.
 
         Setting a rho_scale will multiply the values of rho by that factor, and divide the power density in the field by that factor^2'''

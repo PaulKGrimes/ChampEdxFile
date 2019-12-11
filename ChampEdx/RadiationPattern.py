@@ -115,6 +115,15 @@ class RadiationPattern:
                 for i in range(self.nComponents):
                     self._radPat[i, p, :, f] = cut.data[:]['f{:d}'.format(i+1)]
 
+    def rotatePolarization(self, angle=45.0):
+        '''Rotate the basis of the polarization by <angle>'''
+        ang = np.deg2rad(angle)
+        output0 = self._radPat[0,:,:,:]*np.cos(ang)-self._radPat[1,:,:,:]*np.sin(ang)
+        output1 = self._radPat[1,:,:,:]*np.cos(ang)+self._radPat[0,:,:,:]*np.sin(ang)
+        self._radPat[0,:,:,:] = output0
+        self._radPat[1,:,:,:] = output1
+
+
 
     def getPatternByFreq(self, freq):
         '''Return the radiation pattern at one frequency in frequency vector'''
