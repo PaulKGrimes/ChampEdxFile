@@ -114,10 +114,10 @@ class ApertureField:
 
         return self._apertureField[component, :, zIdx, phiIdx, freqIdx]
 
-    def plotPatterndB(self, component, phi, z, freq, label=None, rho_scale=1.0, **kwargs):
+    def plotPatterndB(self, component, phi, z, freq, label=None, apert_scale=1.0, **kwargs):
         '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency.
 
-        Setting a rho_scale will multiply the values of rho by that factor, and divide the power density in the field by that factor^2'''
+        Setting a apert_scale will multiply the values of rho by that factor, and divide the power density in the field by that factor^2'''
         apertureField = self.getPattern(component, phi, z, freq)
 
         phi = nu.findNearest(self.phi, phi)
@@ -126,12 +126,12 @@ class ApertureField:
 
         if label==None:
             label = r"Component {:d}, $\phi={:g}^\circ$, z={:g}mm, {:g} GHz".format(component, phi, z*1e3, freq/1.0e9)
-        pp.plot(self.rho*rho_scale, 20*np.log10(np.abs(apertureField)/rho_scale), label=label, **kwargs)
+        pp.plot(self.rho*apert_scale, 20*np.log10(np.abs(apertureField)/apert_scale), label=label, **kwargs)
 
-    def plotPatternPhase(self, component, phi, z, freq, label=None, rho_scale=1.0, **kwargs):
+    def plotPatternPhase(self, component, phi, z, freq, label=None, apert_scale=1.0, **kwargs):
         '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency
 
-        Setting a rho_scale will multiply the values of rho by that factor'''
+        Setting a apert_scale will multiply the values of rho by that factor'''
         apertureField = self.getPattern(component, phi, z, freq)
 
         phi = nu.findNearest(self.phi, phi)
@@ -140,7 +140,7 @@ class ApertureField:
 
         if label==None:
             label = r"Component {:d}, $\phi={:g}^\circ$, z={:g}mm, {:g} GHz".format(component, phi, z*1e3, freq/1.0e9)
-        pp.plot(self.rho*rho_scale, np.rad2deg(np.angle(apertureField)-np.angle(apertureField[0])), label=label, **kwargs)
+        pp.plot(self.rho*apert_scale, np.rad2deg(np.angle(apertureField)-np.angle(apertureField[0])), label=label, **kwargs)
 
     def makeSingleSided(self):
         """Converts a double sided aperture field (rho running from -a to +a, phi=0 to phi=180 def)

@@ -140,8 +140,11 @@ class RadiationPattern:
 
         return self._radPat[component, phiIdx,:,freqIdx]
 
-    def plotPatterndB(self, component, phi, freq, label=None, norm=False, **kwargs):
-        '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency'''
+    def plotPatterndB(self, component, phi, freq, apert_scale=1.0, label=None, norm=False, **kwargs):
+        '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency
+
+        apert_scale Aperture scaling contains the relative size of the aperture to scale to. Angles are scaled by 1/factor
+        and amplitude is scaled by factor. This is provided to allow systems with different apertures to be compared.'''
         radPat = self.getPattern(component, phi, freq)
 
         phi = nu.findNearest(self.phi, phi)
@@ -152,10 +155,13 @@ class RadiationPattern:
         zp = 0
         if norm==True:
             zp = 20*np.log10(np.abs(radPat[nu.findNearestIdx(self.theta, 0)]))
-        pp.plot(self.theta, 20*np.log10(np.abs(radPat))-zp, label=label, **kwargs)
+        pp.plot(self.theta/apert_scale, 20*np.log10(apert_scale*np.abs(radPat))-zp, label=label, **kwargs)
 
-    def plotPatternPhase(self, component, phi, freq, label=None, norm=False, **kwargs):
-        '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency'''
+    def plotPatternPhase(self, component, phi, freq, apert_scale=1.0, label=None, norm=False, **kwargs):
+        '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency
+
+                apert_scale Aperture scaling contains the relative size of the aperture to scale to. Angles are scaled by 1/factor.
+                This is provided to allow systems with different apertures to be compared.'''
         radPat = self.getPattern(component, phi, freq)
 
         phi = nu.findNearest(self.phi, phi)
