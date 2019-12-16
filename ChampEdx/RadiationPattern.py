@@ -140,6 +140,14 @@ class RadiationPattern:
 
         return self._radPat[component, phiIdx,:,freqIdx]
 
+    def getValue(self, component, phi, theta, freq):
+        '''Return the value of the component of the field at the requested angle and frequency.'''
+        freqIdx = nu.findNearestIdx(self.frequency, freq)
+        thetaIdx = nu.findNearestIdx(self.theta, theta)
+        phiIdx = nu.findNearestIdx(self.phi, phi)
+
+        return self._radPat[component, phiIdx, thetaIdx, freqIdx]
+
     def plotPatterndB(self, component, phi, freq, apert_scale=1.0, label=None, norm=False, **kwargs):
         '''Convenience function to plot an individual radiation pattern for one component, cut angle and frequency
 
@@ -173,3 +181,28 @@ class RadiationPattern:
         if norm==True:
             zp = np.angle(radPat[nu.findNearestIdx(self.theta, 0)])
         pp.plot(self.theta, np.rad2deg(np.angle(radPat)-zp), label=label, **kwargs)
+
+    def findPeakValue(self, component, phi, freq, apert_scale=1.0, min_theta=-90.0, max_theta=90.0):
+        '''Find and return the peak value of the field component in the given phi cut'''
+        peakTheta = self.findPeakTheta(component, phi, freq, min_theta=min_theta, max_theta=max_theta)
+        return getValue(component, phi, peakTheta, freq, apert_scale=1.0)
+
+    def findPeakTheta(self, component, phi, freq, min_theta=-90.0, max_theta=90.0):
+        '''Find the theta value at which the field component in the requested field cut is maximum'''
+        pattern = self.getPattern(component, phi, freq)
+        # Find the peak of a field
+        x_vals = self.theta
+
+        f = np.abs(pattern)
+        if max_theta != None:
+            tmask = ma.masked_greater(theta, max_theta)
+            f = ma.array(f, mask=tmask.mask)
+
+        if max_theta != None:
+            tmask = ma.masked_less(theta, min_theta)
+            f = ma.array(f, mask=tmask.mask)
+
+        nx = np.unravel_index(np.argmax(abs(f)), f.shape)
+        xPeak = x_vals[nx]
+
+        return xPeak
