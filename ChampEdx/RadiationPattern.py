@@ -11,6 +11,7 @@
 
 from lxml import etree
 import numpy as np
+import numpy.ma as ma
 import NumpyUtility as nu
 from io import StringIO, IOBase
 
