@@ -186,7 +186,7 @@ class RadiationPattern:
     def findPeakValue(self, component, phi, freq, apert_scale=1.0, min_theta=-90.0, max_theta=90.0):
         '''Find and return the peak value of the field component in the given phi cut'''
         peakTheta = self.findPeakTheta(component, phi, freq, min_theta=min_theta, max_theta=max_theta)
-        return getValue(component, phi, peakTheta, freq)
+        return self.getValue(component, phi, peakTheta, freq)
 
     def findPeakTheta(self, component, phi, freq, min_theta=-90.0, max_theta=90.0):
         '''Find the theta value at which the field component in the requested field cut is maximum'''
