@@ -192,7 +192,7 @@ class RadiationPattern:
         '''Find the theta value at which the field component in the requested field cut is maximum'''
         pattern = self.getPattern(component, phi, freq)
         # Find the peak of a field
-        x_vals = self.theta
+        theta = self.theta
 
         f = np.abs(pattern)
         if max_theta != None:
@@ -204,6 +204,6 @@ class RadiationPattern:
             f = ma.array(f, mask=tmask.mask)
 
         nx = np.unravel_index(np.argmax(abs(f)), f.shape)
-        xPeak = x_vals[nx]
+        xPeak = theta[nx]
 
         return xPeak
