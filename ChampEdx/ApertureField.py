@@ -138,9 +138,11 @@ class ApertureField:
         freq = nu.findNearest(self.frequency, freq)
         z = nu.findNearest(self.z, z)
 
+        rho_n_0 = nu.findNearestIdx(self.rho, 0.0)
+
         if label==None:
             label = r"Component {:d}, $\phi={:g}^\circ$, z={:g}mm, {:g} GHz".format(component, phi, z*1e3, freq/1.0e9)
-        pp.plot(self.rho*apert_scale, np.rad2deg(np.angle(apertureField)-np.angle(apertureField[0])), label=label, **kwargs)
+        pp.plot(self.rho*apert_scale, np.rad2deg(np.angle(apertureField)-np.angle(apertureField[rho_n_0])), label=label, **kwargs)
 
     def makeSingleSided(self):
         """Converts a double sided aperture field (rho running from -a to +a, phi=0 to phi=180 def)
